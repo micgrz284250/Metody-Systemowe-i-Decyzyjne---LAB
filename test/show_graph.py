@@ -45,6 +45,8 @@ def generate_colors(colors: dict[int, int]) -> dict[int, str]:
     max_value = max(colors.values())
     min_value = min(colors.values())
     n = max_value - min_value + 1
-    cmap = plt.get_cmap('tab20', n)
+    cmap = plt.get_cmap('hsv', n)
     colors_hex = [mcolors.to_hex(cmap(i)) for i in range(n)]
-    return dict(zip(colors.keys(), [colors_hex[int(node)] for node in colors.values()]))
+    print(colors)
+    print(len(colors_hex))
+    return dict(zip(colors.keys(), [colors_hex[int(node - min_value)] for node in colors.values()]))
