@@ -1,3 +1,4 @@
+from ant_optimization.pheromones import Pheromones
 from test import show_graph, parse_problem_data_text_to_nx_graph, evaluate
 
 def main():
@@ -8,6 +9,8 @@ def main():
     problem_graph = parse_problem_data_text_to_nx_graph(graph_file)
     show_graph(problem_graph, colors)
     print(evaluate(problem_graph, colors))
+    ph = Pheromones(problem_graph, colors)
+    print('hello')
 
 if __name__ == "__main__":
     main()
