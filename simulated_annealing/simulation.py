@@ -4,6 +4,7 @@ https://home.agh.edu.pl/~slukasik/pub/008_Lukasik_Kokosinski_Swieton_LNCS_PPAM20
 """
 
 from typing import Generator
+from simulated_annealing.parameters import *
 import math
 import random
 import statistics
@@ -14,7 +15,7 @@ from simulated_annealing.iteration import Iteration
 
 def get_wrongly_colored_nodes(graph: nx.Graph, colors: dict[str, int]) -> Generator:
     """
-    Returns nodes with neighbours sharing same color. Each node can apear multiple times. 
+    Returns nodes with neighbours sharing same color. Each node can apear multiple times.
     Used for cost counting purposes
     """
     if graph.number_of_nodes() != len(colors):
@@ -34,13 +35,15 @@ def get_colors_set(colors: dict[str, int]) -> frozenset[int]:
 
 
 def cost_function(
-    no_wrongly_colored: int, no_colors: int, wrong_node_cost_mult: int = 2
+    no_wrongly_colored: int,
+    no_colors: int,
+    wrong_node_cost_mult: int = WRONG_NODE_COST_MULT,
 ) -> int:
     """Get the cost of current iteration"""
     return no_wrongly_colored * wrong_node_cost_mult + no_colors
 
 
-def temperature_function(temp: float, cooling_rate: float = 0.95) -> float:
+def temperature_function(temp: float, cooling_rate: float = COOLING_RATE) -> float:
     """Returns updated temperature"""
     return temp * cooling_rate
 
@@ -77,13 +80,13 @@ def get_starting_data(
     """Returns tuple (starting_iteration, starting temperature)"""
     starting_colors = get_random_coloring(graph, starting_no_colors)
     prev_iter = None
-    curr_iter = Iteration.get_nxt_iteration(graph, starting_colors)
+    curr_iter = Iteration.get_iteration(graph, starting_colors, None)
     positive_cost_diffs = []
     # Bierzemy pod uwagę średnią dodatnią zmianę kosztu
     iter_idx = 0
     while iter_idx < no_pilot_iteration:
         prev_iter = curr_iter
-        curr_iter = Iteration.get_nxt_iteration(graph, get_nxt_coloring(prev_iter))
+        curr_iter = Iteration.get_iteration(graph, get_nxt_coloring(prev_iter), None)
         cost_diff = curr_iter.cost - prev_iter.cost
         if cost_diff > 0:
             positive_cost_diffs.append(curr_iter.cost)
@@ -105,13 +108,21 @@ def get_nxt_coloring(iteration: Iteration):
     return get_with_new_color(iteration.result, updated_node, int(updated_color))
 
 
-def get_iteration_function(graph: nx.Graph, ending_condition=lambda _: False):
-    """One iteration of simulated anneling"""
-    iteration, temperature = get_starting_data(graph, 10, 100, 0.95)
+def get_iteration_generator(
+    graph: nx.Graph,
+    ending_condition=lambda _: False,
+    starting_no_colors: int = STARTING_NO_COLORS,
+    no_pilot_iterations: int = NO_PILOT_ITERATIONS,
+    desired_acceptance_prob: float = DESIRED_ACCEPTANCE_PROB,
+):
+    """Iterator of simulated anneling"""
+    iteration, temperature = get_starting_data(
+        graph, starting_no_colors, no_pilot_iterations, desired_acceptance_prob
+    )
     while not ending_condition(iteration):
         yield iteration
         new_coloring = get_nxt_coloring(iteration)
-        new_iteration = Iteration.get_nxt_iteration(graph, new_coloring)
+        new_iteration = Iteration.get_iteration(graph, new_coloring, temperature)
         cost_diff = new_iteration.cost - iteration.cost
         if cost_diff < 0:
             iteration = new_iteration

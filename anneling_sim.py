@@ -1,5 +1,5 @@
 from test import parse_problem_data_text_to_nx_graph
-from simulated_annealing.simulation import get_iteration_function
+from simulated_annealing.simulation import get_iteration_generator
 
 
 def main():
@@ -19,14 +19,14 @@ def main():
     def is_right(it):
         return not bool(it.wrongly_colored_nodes)
 
-    for it in get_iteration_function(problem_graph, is_right):
+    for it in get_iteration_generator(problem_graph, is_right):
         print(it.cost)
         print()
 
     print(
         set(
             it.cost
-            for it in get_iteration_function(problem_graph, iterations(10000000))
+            for it in get_iteration_generator(problem_graph, iterations(10000000))
             if not it.wrongly_colored_nodes
         )
     )
