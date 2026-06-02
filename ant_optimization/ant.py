@@ -1,31 +1,62 @@
+import random
+
+from networkx.classes import graph
+
+from ant_optimization.pheromones import Pheromones
+
+
 class Ant:
-    """
-        :param ant_id
-        :param graph - graph on which ant will run
-        :param current_node - current node on which ant is located
-        :param pheromone_levels - dictionary of pheromone levels for each node
-        :param pheromone_function - function to calculate float value of chance of choosing a node based on its pheromone level
-    """
-    def __init__(self, ant_id, graph, current_node, pheromone_levels, pheromone_function):
+    def __init__(self, ant_id, graph):
         self.ant_id = ant_id
         self.graph = graph
-        self.current_node = current_node
-        self.pheromone_levels = pheromone_levels
-        self.pheromone_function = pheromone_function
+        self.pheromones = Pheromones(graph)
+        self.choosable = set(graph.nodes())
+        self.blocked = set()
+        self.colors = {node: None for node in graph.nodes()}
 
 
-    # def choose_color(self) -> int:
-    #     color_pheromones_current_node = self.pheromone_levels.get_pheromones(self.current_node)
-    #
-    #     total_pheromone = float(sum(color_pheromones_current_node.values()))
-    #     pheromone_draw = random.uniform(0, total_pheromone)
-    #
-    #     for color, pheromone in color_pheromones_current_node.items():
-    #         if pheromone_draw < pheromone:
-    #             return color
-    #         pheromone_draw -= pheromone
-    #
-    #     raise ValueError('Wrong pheromone draw')
+    def run(self):
+        curr_colors = 1
 
-    def run_ant(self):
-        return
+        #iterujemy, dopóki są jeszcze dostępne node w zbiorze wybieralnych
+        while self.choosable:
+            # resetujemy zbiory wybieralnych i zablokowanych
+            self.reset()
+
+            # pobieramy startowy node dla zbioru
+            start_node = self.get_start_point()
+
+            # usuwamy sąsiadów startowego node ze zbioru wybieralnych
+            self.remove_neighbors(start_node)
+
+
+
+            # koniec tworzenia danego zbioru, zwiększamy kolor
+            curr_colors += 1
+
+
+    def get_start_point(self):
+        return random.choice(list(self.choosable))
+
+    def remove_neighbors(self, node):
+        if node in self.choosable:
+            self.choosable.remove(node)
+
+        if node not in self.blocked:
+            self.blocked.add(node)
+
+        for neighbor in self.graph.neighbors(node):
+            if neighbor in self.choosable:
+                self.choosable.remove(neighbor)
+
+            if neighbor not in self.blocked:
+                self.blocked.add(neighbor)
+
+    def reset(self):
+        self.choosable = set()
+        self.blocked = set()
+        for node in self.graph.nodes():
+            if node in self.colors.keys():
+                self.choosable.add(node)
+            else:
+                self.blocked.add(node)
