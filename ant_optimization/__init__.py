@@ -1,1 +1,1 @@
-from .utils import sort_by_available, get_uncolored_nodes
+from .algorithm import optimize

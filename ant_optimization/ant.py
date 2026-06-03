@@ -1,13 +1,11 @@
 import random
 
-from ant_optimization.pheromones import Pheromones
-
 
 class Ant:
-    def __init__(self, ant_id, graph, heuristic_weight=4.0, pheromone_weight=2.0):
+    def __init__(self, ant_id, graph, pheromones, heuristic_weight=4.0, pheromone_weight=2.0):
         self.ant_id = ant_id
         self.graph = graph
-        self.pheromones = Pheromones(graph)
+        self.pheromones = pheromones
         self.choosable = set()
         self.blocked = set()
         self.colored = 0
@@ -15,21 +13,26 @@ class Ant:
         self.heuristic_weight = heuristic_weight
         self.pheromone_weight = pheromone_weight
 
+
     def __str__(self):
-        return f'Ant {self.ant_id}: colored {self.colored} nodes from all {self.graph.number_of_nodes} nodes'
+        return f'Ant {self.ant_id}: colored {self.colored} nodes from all {self.graph.number_of_nodes()} nodes'
+
 
     def run(self):
         curr_colors = 1
 
         #iterujemy, dopóki są jeszcze dostępne node w zbiorze wybieralnych
-        while self.colored != self.graph.number_of_nodes():
+        while self.colored < self.graph.number_of_nodes():
             self.create_color_subset(curr_colors)
             curr_colors += 1
 
+        return self.colors
+
 
     def reset(self):
-        self.choosable = set(node for node in self.colors.keys() if self.colors[node] is not None)
+        self.choosable = set(node for node in self.colors.keys() if self.colors[node] is None)
         self.blocked = set()
+
 
     def get_start_point(self):
         return random.choice(list(self.choosable))
@@ -38,9 +41,6 @@ class Ant:
     def remove_neighbors(self, node):
         if node in self.choosable:
             self.choosable.remove(node)
-
-        if node not in self.blocked:
-            self.blocked.add(node)
 
         for neighbor in self.graph.neighbors(node):
             if neighbor in self.choosable:
@@ -69,7 +69,7 @@ class Ant:
     def calculate_probability(self, node, color_subset):
         pheromone = self.read_pheromones(node, color_subset)
         blocked_neighbors = self.count_blocked_neighbors(node)
-        return pheromone**self.pheromone_weight + blocked_neighbors**self.pheromone_weight
+        return pheromone**self.pheromone_weight * blocked_neighbors**self.heuristic_weight
 
 
     def create_color_subset(self, color):
