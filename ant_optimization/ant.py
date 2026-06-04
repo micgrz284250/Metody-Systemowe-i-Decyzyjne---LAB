@@ -68,7 +68,7 @@ class Ant:
 
     def calculate_probability(self, node, color_subset):
         pheromone = self.read_pheromones(node, color_subset)
-        blocked_neighbors = self.count_blocked_neighbors(node)
+        blocked_neighbors = self.count_blocked_neighbors(node) + 1
         return pheromone**self.pheromone_weight * blocked_neighbors**self.heuristic_weight
 
 
