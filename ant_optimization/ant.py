@@ -26,7 +26,7 @@ class Ant:
             self.create_color_subset(curr_colors)
             curr_colors += 1
 
-        return self.colors
+        return self.colors, len(set(self.colors.values()))
 
 
     def reset(self):

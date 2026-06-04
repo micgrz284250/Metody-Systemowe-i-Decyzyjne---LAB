@@ -1,1 +1,1 @@
-from .algorithm import optimize
+from .colony import optimize
