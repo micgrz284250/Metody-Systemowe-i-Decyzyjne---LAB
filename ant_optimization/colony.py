@@ -34,4 +34,4 @@ def optimize(graph, num_ants=100, num_iterations=50, heuristic_weight=4.0, phero
 
         print(f'--- End of iteration {iteration}. Best score so far: {best_score} ---')
 
-    return best_colors
+    return best_colors, best_score
