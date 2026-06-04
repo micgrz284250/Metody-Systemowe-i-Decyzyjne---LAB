@@ -23,8 +23,8 @@ class Pheromones:
         for color_subset in color_subsets.values():
             if len(color_subset) > 1:
                 for node_a, node_b in itertools.combinations(color_subset, 2):
-                    self.pheromones[node_a, node_b] += value
-                    self.pheromones[node_b, node_a] += value
+                    self.pheromones[int(node_a)-1, int(node_b)-1] += value
+                    self.pheromones[int(node_b)-1, int(node_a)-1] += value
 
     def get_pheromone(self, node_from: int, node_to: int) -> float:
-        return self.pheromones[node_from, node_to]
+        return self.pheromones[node_from-1, node_to-1]

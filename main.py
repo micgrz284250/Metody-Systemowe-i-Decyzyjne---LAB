@@ -1,16 +1,12 @@
-from ant_optimization.pheromones import Pheromones
-from test import show_graph, parse_problem_data_text_to_nx_graph, evaluate
+from ant_optimization import colony
+from test import parse_problem_data_text_to_nx_graph, show_graph
+
 
 def main():
-    colors_key = [i for i in range(1, 139)]
-    colors_values = [i for i in range(1, 139)]
-    colors = dict(zip(colors_key, colors_values))
     graph_file = 'instances/anna.col'
     problem_graph = parse_problem_data_text_to_nx_graph(graph_file)
+    colors = colony.optimize(problem_graph, num_ants=10, num_iterations=5)
     show_graph(problem_graph, colors)
-    print(evaluate(problem_graph, colors))
-    ph = Pheromones(problem_graph, colors)
-    print('hello')
 
 if __name__ == "__main__":
     main()

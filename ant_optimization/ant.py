@@ -61,7 +61,7 @@ class Ant:
     def read_pheromones(self, node, color_subset):
         pheromone = 0.0
         for colored_node in color_subset:
-            pheromone += self.pheromones.get_pheromone(node, colored_node)
+            pheromone += self.pheromones.get_pheromone(int(node), int(colored_node))
         pheromone /= len(color_subset)
         return pheromone
 
