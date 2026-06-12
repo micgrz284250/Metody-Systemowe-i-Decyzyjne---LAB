@@ -1,17 +1,22 @@
 import random
 
+import numpy as np
+
+from ant_optimization.pheromones import Pheromones
+
 
 class Ant:
-    def __init__(self, ant_id, graph, pheromones, heuristic_weight=4.0, pheromone_weight=2.0):
+    def __init__(self, ant_id, neighbors, pheromones, heuristic_weight=4.0, pheromone_weight=2.0):
         self.ant_id = ant_id
-        self.graph = graph
+        # w celu optymalizacji algorytmu sąsiadów przechowujmy w słowniku
+        self.neighbors = neighbors
         self.pheromones = pheromones
         self.choosable = set()
         self.blocked = set()
         self.colored = 0
-        self.colors = {node: None for node in self.graph.nodes}
-        self.blocked_count = {node: 0 for node in self.graph.nodes}
-        self.pheromones_cache = {node: 0.0 for node in self.graph.nodes}
+        self.colors = {node: None for node in self.neighbors.keys()}
+        self.blocked_count = {node: 0 for node in self.neighbors.keys()}
+        self.pheromones_cache = {node: 0.0 for node in self.neighbors.keys()}
         self.heuristic_weight = heuristic_weight
         self.pheromone_weight = pheromone_weight
 
@@ -21,8 +26,8 @@ class Ant:
     def run(self):
         curr_colors = 1
 
-        #iterujemy, dopóki są jeszcze dostępne niepokolorowane node
-        while self.colored < self.graph.number_of_nodes():
+        # iterujemy, dopóki są jeszcze dostępne niepokolorowane node
+        while self.colored < len(self.neighbors):
             self.create_color_subset(curr_colors)
             curr_colors += 1
 
@@ -41,7 +46,7 @@ class Ant:
         if node in self.choosable:
             self.choosable.remove(node)
 
-        for neighbor in self.graph.neighbors(node):
+        for neighbor in self.neighbors[node]:
             if neighbor in self.choosable:
                 self.choosable.remove(neighbor)
 
@@ -49,26 +54,21 @@ class Ant:
                 self.blocked.add(neighbor)
 
     def update_blocked_count(self, node):
-        for neighbor in self.graph.neighbors(node):
+        for neighbor in self.neighbors[node]:
             self.blocked_count[neighbor] += 1
 
     def update_pheromones_cache(self, node):
-        for node_ in self.choosable:
-            self.pheromones_cache[node] += self.pheromones.get_pheromone(node, node_)
+        idx = node - 1
+        choosable_idx = np.array([n - 1 for n in self.choosable], dtype=np.int32)
+        self.pheromones_cache[node] = self.pheromones[idx, choosable_idx].sum()
 
     def update(self, node):
         self.remove_neighbors(node)
         self.update_blocked_count(node)
         self.update_pheromones_cache(node)
 
-    def calculate_probability(self, node):
-        pheromone = self.pheromones_cache[node]
-        blocked_neighbors = self.blocked_count[node] + 1  # +1, aby uniknąć dzielenia przez zero
-        return pheromone ** self.pheromone_weight * blocked_neighbors ** self.heuristic_weight
-
     def create_color_subset(self, color):
         # definiujemy sobie podzbiór node, które będą miały ten sam kolor
-        color_subset = set()
 
         # resetujemy zbiory wybieralnych i zablokowanych
         self.reset()
@@ -76,23 +76,27 @@ class Ant:
         # pobieramy startowy node dla zbioru
         start_node = self.get_start_point()
         self.colored += 1
-        color_subset.add(start_node)
         self.colors[start_node] = color
 
         # usuwamy sąsiadów startowego node ze zbioru wybieralnych
         self.update(start_node)
 
         while self.choosable:
-            # obliczamy prawdopodobieństwo dla każdego node ze zbioru wybieralnych
-            probabilities = {node: self.calculate_probability(node) for node in self.choosable}
-
-            # na podstawie prawdopodobieństwa losujemy node do pokolorowania
-            total_probability = sum(probabilities.values())
-            if total_probability == 0:
-                probabilities = {node: 1.0 / len(self.choosable) for node in self.choosable}
-            selected_node = random.choices(list(probabilities.keys()), weights=list(probabilities.values()), k=1)[0]
-
+            selected_node = self.select_node()
             self.colored += 1
-            color_subset.add(selected_node)
             self.colors[selected_node] = color
             self.update(selected_node)
+
+    def select_node(self):
+        nodes = list(self.choosable)
+        ph_vals = np.array([self.pheromones_cache[n] for n in nodes])
+        bl_vals = np.array([self.blocked_count[n] + 1 for n in nodes], dtype=np.float64)
+
+        weights = (ph_vals ** self.pheromone_weight) * (bl_vals ** self.heuristic_weight)
+        total = weights.sum()
+
+        if total == 0:
+            return random.choice(nodes)
+
+        weights /= total
+        return nodes[np.random.choice(len(nodes), p=weights)]
