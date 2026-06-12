@@ -2,6 +2,7 @@ from ant_optimization import colony
 from test import parse_problem_data_text_to_nx_graph, show_graph, evaluate
 
 
+
 def main():
     graph_file = 'instances/school1_nsh.col'
     problem_graph = parse_problem_data_text_to_nx_graph(graph_file)
