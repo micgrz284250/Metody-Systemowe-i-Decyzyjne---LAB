@@ -12,4 +12,4 @@ def evaluate(graph: nx.Graph, colors: dict[int, int]) -> float:
         for neighbor in adjacent:
             if colors[int(node)] == colors[int(neighbor)]:
                 return inf
-    return len(set(colors.keys()))
+    return len(set(colors.values()))
