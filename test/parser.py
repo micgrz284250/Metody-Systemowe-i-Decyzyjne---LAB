@@ -28,7 +28,7 @@ def parse_problem_data_text_to_nx_graph(file_name: str) -> nx.Graph:
                         graph.add_node(node_id)
                 elif command_type_indicator == _EDGE_INDICATOR:
                     [_, fst_node, sec_node] = data
-                    graph.add_edge(fst_node, sec_node)
+                    graph.add_edge(int(fst_node), int(sec_node))
                     edge_count += 1
                     if edge_count > int(num_of_edges):
                         raise ValueError(f'Edge count should be less or equal to {num_of_edges}')
