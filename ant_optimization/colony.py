@@ -1,37 +1,63 @@
+from concurrent.futures import ProcessPoolExecutor
+
 from .ant import Ant
 from .pheromones import Pheromones
 
 
-def optimize(graph, num_ants=100, num_iterations=50, heuristic_weight=4.0, pheromone_weight=2.0, evaporate_value=0.5, threads=1):
-    pheromones = Pheromones(graph)
+def run_ant(args):
+    ant_id, graph, pheromones, heuristic_weight, pheromone_weight = args
+    print(f"Starting ant {ant_id}")
+    ant = Ant(ant_id, graph, pheromones, heuristic_weight, pheromone_weight)
+    colors, score = ant.run()
+    print(f"Ant {ant_id} finished with score {score}")
+    return ant_id, colors, score
 
+
+def optimize(graph,
+             num_ants=100,
+             num_iterations=50,
+             heuristic_weight=4.0,
+             pheromone_weight=2.0,
+             evaporate_value=0.5,
+             threads=4):
+    ant_id = 1
+
+    pheromones = Pheromones(graph)
     best_colors = None
     best_score = float('inf')
 
-    ant_id = 1
-    for iteration in range(num_iterations):
-        print(f'--- Running iteration {iteration} ---')
+    print(f'Running optimization with {num_iterations} iterations, {num_ants} ants per iteration and {threads} threads')
 
-        solutions = []
-        for ant in range(num_ants):
-            print(f'Running ant {ant_id}...')
+    with ProcessPoolExecutor(max_workers=threads) as executor:
+        for iteration in range(num_iterations):
+            print(f'--- Running iteration {iteration} ---')
+            solutions = []
 
-            ant = Ant(ant_id, graph, pheromones, heuristic_weight, pheromone_weight)
-            colors, score = ant.run()
-            solutions.append((colors, score))
+            # preparing and data
+            ant_args = [
+                (ant_id + i, graph, pheromones, heuristic_weight, pheromone_weight)
+                for i in range(num_ants)
+            ]
+            ant_id += num_ants
 
-            if score < best_score:
-                best_colors = colors
-                best_score = score
+            # process running
+            results = executor.map(run_ant, ant_args)
 
-            print(f'Ant {ant_id} found solution with score {score}. Best score so far: {best_score}')
+            # result analysis
+            for ant_id, colors, score in results:
+                solutions.append((colors, score))
 
-            ant_id += 1
-        pheromones.evaporate(evaporate_value)
+                if score < best_score:
+                    best_colors = colors
+                    best_score = score
 
-        for colors, score in solutions:
-            pheromones.add_pheromones(colors, score)
+            print(f'Best score for ant iteration: {best_score}')
 
-        print(f'--- End of iteration {iteration}. Best score so far: {best_score} ---')
+            pheromones.evaporate(evaporate_value)
+
+            for colors, score in solutions:
+                pheromones.add_pheromones(colors, score)
+
+            print(f'--- End of iteration {iteration}. Best score so far: {best_score} ---')
 
     return best_colors, best_score
