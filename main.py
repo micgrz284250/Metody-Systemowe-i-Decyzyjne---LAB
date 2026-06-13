@@ -7,7 +7,7 @@ from test import parse_problem_data_text_to_nx_graph, show_graph, evaluate
 
 
 def main():
-    graph_file = 'test_graphs/grid_20x20.col'
+    graph_file = 'instances/test_graphs/grid_20x20.col'
     problem_graph = parse_problem_data_text_to_nx_graph(graph_file)
 
     # print(len(problem_graph.nodes))
@@ -24,7 +24,7 @@ def main():
         num_ants, iterations = iteration
         for i in range(10):
             start = time.perf_counter()
-            colors, score = colony.optimize(problem_graph, num_ants=num_ants, num_iterations=iterations, heuristic_weight=4.0, pheromone_weight=2.0, evaporate_value=0.5, threads=1)
+            colors, score = colony.optimize(problem_graph, num_ants=num_ants, num_iterations=iterations, heuristic_weight=4.0, pheromone_weight=2.0, evaporate_value=0.5, threads=8)
             end = time.perf_counter()
 
             print(f'Elapsed time: {end - start} seconds')
@@ -43,11 +43,11 @@ def main():
     # show_graph(problem_graph, colors)
 
 def show():
-    graph_file = 'hard_graphs/petersen_40_6.col'
+    graph_file = 'instances/hard_graphs/petersen_40_6.col'
     problem_graph = parse_problem_data_text_to_nx_graph(graph_file)
     colors = {node: 1 for node in problem_graph.nodes()}
     show_graph(problem_graph, colors)
 
 if __name__ == "__main__":
-    show()
-    # main()
+    # show()
+    main()

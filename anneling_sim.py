@@ -8,7 +8,7 @@ from test import parse_problem_data_text_to_nx_graph, evaluate
 
 
 def main():
-    graph_file = "hard_graphs/hard_3colorable_450.col"
+    graph_file = "instances/hard_graphs/hard_3colorable_450.col"
     problem_graph = parse_problem_data_text_to_nx_graph(graph_file)
 
     def iterations(no_iteration):

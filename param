@@ -1,0 +1,44 @@
+ACO_1 = dict(  # optymalne
+    num_ants=50, num_iterations=30,
+    heuristic_weight=4.0, pheromone_weight=2.0,
+    evaporate_value=0.5
+)
+
+ACO_2 = dict(  # stagnacja feromonowa
+    num_ants=10, num_iterations=100,
+    heuristic_weight=0.5, pheromone_weight=5.0,
+    evaporate_value=0.95
+)
+
+ACO_3 = dict(  # zachłanny (feromony ignorowane)
+    num_ants=50, num_iterations=30,
+    heuristic_weight=4.0, pheromone_weight=0.0,
+    evaporate_value=0.1
+)
+
+ACO_4 = dict(  # test jednej mrówki
+    num_ants=1, num_iterations=1,
+    heuristic_weight=0.0, pheromone_weight=2.0,
+    evaporate_value=0.1
+)
+
+SA_1 = dict(  # optymalne
+    cooling_rate=0.9995,
+    starting_no_colors=10,
+    no_pilot_iterations=100,
+    desired_acceptance_prob=0.95
+)
+
+SA_2 = dict(  # za szybkie chłodzenie (stagnacja)
+    cooling_rate=0.99,
+    starting_no_colors=10,
+    no_pilot_iterations=100,
+    desired_acceptance_prob=0.95
+)
+
+SA_3 = dict(  # za wolne chłodzenie (eksploracja bez zbieżności)
+    cooling_rate=0.9999,
+    starting_no_colors=10,
+    no_pilot_iterations=100,
+    desired_acceptance_prob=0.95
+)
