@@ -7,7 +7,7 @@ class Ant:
         self.ant_id = ant_id
         # w celu optymalizacji algorytmu sąsiadów przechowujmy w słowniku
         self.neighbors = neighbors
-        self.pheromones = pheromones
+        self.pheromones = pheromones.values
         self.choosable = set()
         self.blocked = set()
         self.colored = 0

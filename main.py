@@ -1,14 +1,13 @@
-import networkx as nx
+import resource
+import time
+import tracemalloc
 
 from ant_optimization import colony
 from test import parse_problem_data_text_to_nx_graph, show_graph, evaluate
-import tracemalloc
-import resource
-import time
 
 
 def main():
-    graph_file = 'hard_graphs/hard_3colorable_450.col'
+    graph_file = 'test_graphs/grid_20x20.col'
     problem_graph = parse_problem_data_text_to_nx_graph(graph_file)
 
     # print(len(problem_graph.nodes))
@@ -44,11 +43,11 @@ def main():
     # show_graph(problem_graph, colors)
 
 def show():
-    graph_file = 'hard_graphs/hard_3colorable_450.col'
+    graph_file = 'hard_graphs/petersen_40_6.col'
     problem_graph = parse_problem_data_text_to_nx_graph(graph_file)
     colors = {node: 1 for node in problem_graph.nodes()}
     show_graph(problem_graph, colors)
 
 if __name__ == "__main__":
     show()
-    main()
+    # main()

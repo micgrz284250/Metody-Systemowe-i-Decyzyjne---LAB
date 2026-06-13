@@ -114,6 +114,7 @@ def get_iteration_generator(
     starting_no_colors: int = STARTING_NO_COLORS,
     no_pilot_iterations: int = NO_PILOT_ITERATIONS,
     desired_acceptance_prob: float = DESIRED_ACCEPTANCE_PROB,
+    cooling_rate: float = COOLING_RATE,
 ):
     """Iterator of simulated anneling"""
     iteration, temperature = get_starting_data(
@@ -130,4 +131,4 @@ def get_iteration_generator(
             acceptance_prob = get_prob_from_temp(temperature, cost_diff)
             if random.random() < acceptance_prob:
                 iteration = new_iteration
-        temperature = temperature_function(temperature)
+        temperature = temperature_function(temperature, cooling_rate)
