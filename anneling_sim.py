@@ -1,5 +1,8 @@
-from test import parse_problem_data_text_to_nx_graph
+import resource
+import tracemalloc
+
 from simulated_annealing.simulation import get_iteration_generator
+from test import parse_problem_data_text_to_nx_graph, evaluate
 
 
 def main():
@@ -23,13 +26,30 @@ def main():
         print(it.cost)
         print()
 
+    tracemalloc.start()
+
     print(
         set(
             it.cost
-            for it in get_iteration_generator(problem_graph, iterations(10000000))
+            for it in get_iteration_generator(problem_graph, iterations(10000))
             if not it.wrongly_colored_nodes
         )
     )
+
+    current, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+
+    rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+
+    print(f"tracemalloc peak: {peak / 1024 / 1024:.1f} MB")
+    print(f"RSS peak:         {rss / 1024:.1f} MB")
+
+    print(f'Found solution: {it.result}')
+    print(f'Evaluated {evaluate(problem_graph, it.result)}')
+
+    # for it in get_iteration_generator(problem_graph, lambda x: x.temperature is not None and x.temperature == 0):
+    #     print(it.temperature)
+    #     print(evaluate(problem_graph, it.result))
 
 
 if __name__ == "__main__":

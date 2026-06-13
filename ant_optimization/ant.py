@@ -1,8 +1,5 @@
 import random
-
 import numpy as np
-
-from ant_optimization.pheromones import Pheromones
 
 
 class Ant:
@@ -68,7 +65,7 @@ class Ant:
         self.update_pheromones_cache(node)
 
     def create_color_subset(self, color):
-        # definiujemy sobie podzbiór node, które będą miały ten sam kolor
+        # definiujemy podzbiór node, które będą miały ten sam kolor
 
         # resetujemy zbiory wybieralnych i zablokowanych
         self.reset()

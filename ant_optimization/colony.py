@@ -40,15 +40,15 @@ def optimize(graph,
     shared_ph = np.ndarray(pheromones.values.shape, dtype=np.float64, buffer=shm.buf)
     np.copyto(shared_ph, pheromones.values)
 
-    print(f"neighbors: {sys.getsizeof(pickle.dumps(neighbors)) / 1024:.1f} KB")
-    print(f"ph_matrix: {sys.getsizeof(pickle.dumps(pheromones)) / 1024:.1f} KB")
-
-    print(f'Running optimization with {num_iterations} iterations, {num_ants} ants per iteration and {threads} threads')
+    # print(f"neighbors: {sys.getsizeof(pickle.dumps(neighbors)) / 1024:.1f} KB")
+    # print(f"ph_matrix: {sys.getsizeof(pickle.dumps(pheromones)) / 1024:.1f} KB")
+    #
+    # print(f'Running optimization with {num_iterations} iterations, {num_ants} ants per iteration and {threads} threads')
 
     try:
         with ProcessPoolExecutor(max_workers=threads) as executor:
             for iteration in range(num_iterations):
-                print(f'--- Running iteration {iteration} ---')
+                # print(f'--- Running iteration {iteration} ---')
                 solutions = []
 
                 # preparing and data
@@ -69,14 +69,14 @@ def optimize(graph,
                         best_colors = colors
                         best_score = score
 
-                print(f'Best score for ant iteration: {best_score}')
+                # print(f'Best score for ant iteration: {best_score}')
 
                 pheromones.evaporate(evaporate_value)
 
                 for colors, score in solutions:
                     pheromones.add_pheromones(colors, score)
 
-                print(f'--- End of iteration {iteration}. Best score so far: {best_score} ---')
+                # print(f'--- End of iteration {iteration}. Best score so far: {best_score} ---')
     finally:
         shm.close()
         shm.unlink()
