@@ -1,6 +1,4 @@
-import resource
 import time
-import tracemalloc
 from math import inf
 
 from simulated_annealing.simulation import get_iteration_generator
@@ -26,7 +24,6 @@ def main():
 
     def optimize_result(result):
         col_range = len(set(result.values()))
-
 
     iteration_list = [1000, 10000, 100000]
     for iteration in iteration_list:
