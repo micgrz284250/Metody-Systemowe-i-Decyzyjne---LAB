@@ -89,7 +89,7 @@ def get_starting_data(
         curr_iter = Iteration.get_iteration(graph, get_nxt_coloring(prev_iter), None)
         cost_diff = curr_iter.cost - prev_iter.cost
         if cost_diff > 0:
-            positive_cost_diffs.append(curr_iter.cost)
+            positive_cost_diffs.append(cost_diff)
             iter_idx += 1
     return (curr_iter, get_starting_temp(positive_cost_diffs, desired_acceptance_prob))
 
