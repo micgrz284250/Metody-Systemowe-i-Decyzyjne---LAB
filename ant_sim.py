@@ -58,7 +58,7 @@ def run_ant_sim():
     for iteration in iterations:
         for graph in graphs:
             problem_graph = parse_problem_data_text_to_nx_graph(graph)
-            filename = f"results_{iteration['num_ants']}_{iteration['num_iterations']}_{iteration['heuristic_weight']}_{iteration['pheromone_weight']}_{iteration['evaporate_value']}_{graph.replace(".col", "").replace("instances/", "").replace("test_graphs/", "").replace("hard_graphs/", "")}.txt"
+            filename = f"ACO_results_{iteration['num_ants']}_{iteration['num_iterations']}_{iteration['heuristic_weight']}_{iteration['pheromone_weight']}_{iteration['evaporate_value']}_{graph.replace(".col", "").replace("instances/", "").replace("test_graphs/", "").replace("hard_graphs/", "")}.txt"
 
             with open(filename, "w") as f:
                 f.write(f"Parameters: {iteration}\n")
@@ -66,7 +66,9 @@ def run_ant_sim():
 
                 for i in range(per_iter):
                     f.write(f"---Run {i+1}---\n")
+
                     start_time = time.perf_counter()
+
                     colors, score = colony.optimize(problem_graph,
                                                     num_ants=iteration["num_ants"],
                                                     num_iterations=iteration["num_iterations"],
@@ -74,7 +76,9 @@ def run_ant_sim():
                                                     pheromone_weight=iteration["pheromone_weight"],
                                                     evaporate_value=iteration["evaporate_value"],
                                                     threads=1)
+
                     end_time = time.perf_counter()
+
                     f.write(f"Duration: {end_time - start_time} seconds\n")
                     f.write(f"Score: {evaluate(problem_graph, colors)}\n")
                     f.write(f"Result: {colors}\n\n")
