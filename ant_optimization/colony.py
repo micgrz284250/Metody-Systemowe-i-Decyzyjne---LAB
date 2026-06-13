@@ -29,21 +29,13 @@ def optimize(graph,
     best_colors = None
     best_score = float('inf')
 
-    # print(f"neighbors: {sys.getsizeof(pickle.dumps(neighbors)) / 1024:.1f} KB")
-    # print(f"ph_matrix: {sys.getsizeof(pickle.dumps(pheromones)) / 1024:.1f} KB")
-    #
-    # print(f'Running optimization with {num_iterations} iterations, {num_ants} ants per iteration and {threads} threads')
-
     with ProcessPoolExecutor(max_workers=threads) as executor:
         for iteration in range(num_iterations):
             print(f'--- Running iteration {iteration} ---')
             solutions = []
 
             # preparing and data
-            ant_args = [
-                (ant_id + i, neighbors, pheromones, heuristic_weight, pheromone_weight)
-                for i in range(num_ants)
-            ]
+            ant_args = [(ant_id + i, neighbors, pheromones, heuristic_weight, pheromone_weight) for i in range(num_ants)]
             ant_id += num_ants
 
             # process running
