@@ -1,12 +1,14 @@
 import resource
+import time
 import tracemalloc
+from math import inf
 
 from simulated_annealing.simulation import get_iteration_generator
 from test import parse_problem_data_text_to_nx_graph, evaluate
 
 
 def main():
-    graph_file = "instances/anna.col"
+    graph_file = "hard_graphs/hard_3colorable_450.col"
     problem_graph = parse_problem_data_text_to_nx_graph(graph_file)
 
     def iterations(no_iteration):
@@ -22,34 +24,26 @@ def main():
     def is_right(it):
         return not bool(it.wrongly_colored_nodes)
 
-    for it in get_iteration_generator(problem_graph, is_right):
-        print(it.cost)
-        print()
+    iteration_list = [1000, 10000, 100000]
+    for iteration in iteration_list:
+        for i in range(10):
+            best_res = {}
+            best_sco = inf
+            start = time.perf_counter()
 
-    tracemalloc.start()
+            for it in get_iteration_generator(problem_graph, iterations(iteration)):
+                if it.cost < best_sco:
+                    best_sco = it.cost
+                    best_res = it.result
 
-    print(
-        set(
-            it.cost
-            for it in get_iteration_generator(problem_graph, iterations(10000))
-            if not it.wrongly_colored_nodes
-        )
-    )
+            end = time.perf_counter()
 
-    current, peak = tracemalloc.get_traced_memory()
-    tracemalloc.stop()
+            print(f'Elapsed time: {end - start} seconds')
+            print(f'Found solution: {best_res}')
+            print(f'Score: {best_sco}')
+            print(f'Evaluated {evaluate(problem_graph, best_res)}')
 
-    rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
-    print(f"tracemalloc peak: {peak / 1024 / 1024:.1f} MB")
-    print(f"RSS peak:         {rss / 1024:.1f} MB")
-
-    print(f'Found solution: {it.result}')
-    print(f'Evaluated {evaluate(problem_graph, it.result)}')
-
-    # for it in get_iteration_generator(problem_graph, lambda x: x.temperature is not None and x.temperature == 0):
-    #     print(it.temperature)
-    #     print(evaluate(problem_graph, it.result))
 
 
 if __name__ == "__main__":
