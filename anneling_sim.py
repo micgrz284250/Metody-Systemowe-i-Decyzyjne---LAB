@@ -12,7 +12,14 @@ SA_2 = dict(  # za wolne chłodzenie (eksploracja bez zbieżności)
     cooling_rate=0.9999,
 )
 
-iterations_data = [SA_1, SA_2]
+print(SA_1["cooling_rate"])
+print(SA_2["cooling_rate"])
+
+iterations_data = [
+    SA_1,
+    # SA_2
+]
+
 iterations_count = [
     1000,
     # 1500
@@ -21,10 +28,10 @@ iterations_count = [
 per_iter = 10
 
 graphs = [
-    "instances/le450_15b.col",
+    # "instances/le450_15b.col",
     "instances/hard_graphs/queen_11x11.col",
-    "instances/test_graphs/grid_20x20.col",
-    "instances/hard_graphs/hard_3colorable_450.col",
+    # "instances/test_graphs/grid_20x20.col",
+    # "instances/hard_graphs/hard_3colorable_450.col",
 ]
 
 
@@ -48,6 +55,7 @@ def run_sa_sim():
         for count in iterations_count:
             for graph in graphs:
                 problem_graph = parse_problem_data_text_to_nx_graph(graph)
+                adj_dict = {node: list(problem_graph.neighbors(node)) for node in problem_graph.nodes}
                 fixed_count = count * problem_graph.number_of_nodes()
                 num_starting_colors = int(max(10, sqrt(problem_graph.number_of_nodes())))
                 print(num_starting_colors)
@@ -69,11 +77,15 @@ def run_sa_sim():
 
                                 start_time = time.perf_counter()
 
-                                for it in get_iteration_generator(graph=problem_graph,
+                                i = 0
+                                for it in get_iteration_generator(adj=adj_dict,
                                                                   ending_condition=iterations(sub_count),
                                                                   cooling_rate=iteration["cooling_rate"],
                                                                   starting_no_colors=num_of_colors):
                                     score = len(it.colors_used) if len(it.wrongly_colored_nodes) == 0 else inf
+                                    i += 1
+                                    if i % 1000 == 0:
+                                        print(i)
                                     if score < best_score or best_res == {}:
                                         best_score = len(it.colors_used)
                                         best_res = it.result
@@ -83,3 +95,10 @@ def run_sa_sim():
                                 f.write(f"Duration: {end_time - start_time} seconds\n")
                                 f.write(f"Score: {evaluate(problem_graph, best_res)}\n")
                                 f.write(f"Result: {minimize_colors_dict(best_res)}\n\n")
+
+'''
+zmienne parametry
+cooling rate: 0.9995 albo wyliczane dynamicznie
+iter count: 1000 lub 1000 * liczba wierzchołków (poprawka względem mrówkowego)
+początkowa liczba kolorów: sqrt(node) lub node
+'''

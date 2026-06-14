@@ -5,8 +5,7 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class Iteration:
     """Simulated annealing iteration result data. This should immutable, don't edit it."""
-
-    graph: nx.Graph  # nx graph instance
+    adj: dict  # nx graph instance
     result: dict[str, int]  # colors for each node
     colors_used: frozenset[int]  # all colors used
     cost: int  # calculated cost of iteration
@@ -16,7 +15,7 @@ class Iteration:
     )  # current temperature. Can be None while we try to find starting temperature
 
     @classmethod
-    def get_iteration(cls, graph: nx.Graph, coloring: dict[str, int], temp: float | None):
+    def get_iteration(cls, adj, coloring: dict[str, int], temp: float | None):
         """This function returns new iteration data based on graph and coloring"""
         from simulated_annealing.simulation import (
             get_wrongly_colored_nodes,
@@ -24,7 +23,7 @@ class Iteration:
             cost_function,
         )
 
-        wrongly_colored = list(get_wrongly_colored_nodes(graph, coloring))
+        wrongly_colored = list(get_wrongly_colored_nodes(adj, coloring))
         colors_set = get_colors_set(coloring)
         cost = cost_function(len(wrongly_colored), len(colors_set))
-        return cls(graph, coloring, colors_set, cost, wrongly_colored, temp)
+        return cls(adj, coloring, colors_set, cost, wrongly_colored, temp)
