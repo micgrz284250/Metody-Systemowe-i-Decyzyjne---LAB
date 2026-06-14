@@ -76,7 +76,7 @@ def run_sa_sim(graphs: list[str], per_iter: int):
                                     i = 0
                                     for it in get_iteration_generator(adj=adj_dict,
                                                                       ending_condition=iterations(sub_count),
-                                                                      cooling_rate=iteration["cooling_rate"],
+                                                                      cooling_rate=cooling,
                                                                       starting_no_colors=num_of_colors):
                                         score = len(it.colors_used) if len(it.wrongly_colored_nodes) == 0 else inf
                                         i += 1
