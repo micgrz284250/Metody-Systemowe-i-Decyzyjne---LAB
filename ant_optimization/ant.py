@@ -58,7 +58,7 @@ class Ant:
     def update_blocked_count(self, node):
         if node in self.blocked:
             for neighbor in self.adj[node]:
-                self.adj[neighbor] += 1
+                self.blocked_cache[neighbor] += 1
 
     def update_pheromones_cache(self, node):
         for sec_node in self.choosable:
