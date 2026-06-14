@@ -48,6 +48,9 @@ class Ant:
         if node in self.choosable:
             self.choosable.remove(node)
 
+        if node not in self.blocked:
+            self.blocked.add(node)
+
         for neighbor in self.adj[node]:
             if neighbor in self.choosable:
                 self.choosable.remove(neighbor)
