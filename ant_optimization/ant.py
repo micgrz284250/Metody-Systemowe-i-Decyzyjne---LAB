@@ -88,7 +88,9 @@ class Ant:
             self.update(selected_node)
 
     def calculate_weight(self, node):
-        return (self.blocked_cache[node] + 1)**self.heuristic_weight * self.pheromones_cache[node]**self.pheromone_weight
+        weight = (self.blocked_cache[node] + 1)**self.heuristic_weight * self.pheromones_cache[node]**self.pheromone_weight
+        # print(f'Weight for {node} is {weight}')
+        return weight
 
     def select_node(self):
         nodes = list(self.choosable)

@@ -39,30 +39,24 @@ ACO_4 = dict(  # test jednej mrówki, która losowo koloruje
     evaporate_value=0.1
 )
 
-iterations = [ACO_1_1, ACO_1_2, ACO_1_3, ACO_2, ACO_3, ACO_4]
-
-per_iter = 10
-
-graphs = [
-    "instances/le450_15b.col",
-    "instances/hard_graphs/queen_11x11.col",
-    "instances/test_graphs/grid_20x20.col",
-    "instances/hard_graphs/hard_3colorable_450.col",
+iterations = [
+    ACO_1_1,
+    ACO_1_2,
+    ACO_1_3,
+    ACO_2,
+    ACO_3,
+    ACO_4
 ]
 
-# sprawdzanie, czy pliki istnieją
-for test_graph in graphs:
-    parse_problem_data_text_to_nx_graph(test_graph)
-
-def run_ant_sim():
+def run_ant_sim(graphs: list[str], per_iter: int):
     for iteration in iterations:
         for graph in graphs:
             problem_graph = parse_problem_data_text_to_nx_graph(graph)
-            filename = f"ACO_results_{iteration['num_ants']}_{iteration['num_iterations']}_{iteration['heuristic_weight']}_{iteration['pheromone_weight']}_{iteration['evaporate_value']}_{graph.replace(".col", "").replace("instances/", "").replace("test_graphs/", "").replace("hard_graphs/", "")}.txt"
+            filename = f"ACO_results_{iteration['num_ants']}_{iteration['num_iterations']}_{iteration['heuristic_weight']}_{iteration['pheromone_weight']}_{iteration['evaporate_value']}_{graph.replace(".col", "").replace("instances/", "").replace("pograzajace_ACO/", "").replace("test_graphs/", "").replace("hard_graphs/", "")}.txt"
 
             with open(filename, "w") as f:
                 f.write(f"Parameters: {iteration}\n")
-                f.write(f"Graph: {graph.replace(".col", "").replace("instances/", "").replace("test_graphs/", "").replace("hard_graphs/", "")}\n")
+                f.write(f"Graph: {graph.replace(".col", "").replace("instances/", "").replace("test_graphs/", "").replace("hard_graphs/", "").replace("pograzajace_ACO/", "")}\n")
 
                 for i in range(per_iter):
                     f.write(f"---Run {i+1}---\n")
@@ -82,3 +76,6 @@ def run_ant_sim():
                     f.write(f"Duration: {end_time - start_time} seconds\n")
                     f.write(f"Score: {evaluate(problem_graph, colors)}\n")
                     f.write(f"Result: {colors}\n\n")
+
+if __name__ == "__main__":
+    run_ant_sim()

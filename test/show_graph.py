@@ -17,6 +17,10 @@ def show_graph(graph: nx.Graph, colors: dict[int, int] = None) -> None:
     if colors is not None and graph.number_of_nodes() != len(colors):
         raise ValueError(f'Graph and colors mismatch, nodes: {graph.number_of_nodes()} != {len(colors)}')
 
+    if colors is None:
+        print("Graph visualization without colors")
+        colors = {node: 1 for node in graph.nodes()}
+
     # --- POPRAWKA: Filtrujemy węzły bez krawędzi (samotne wyspy) ---
     nodes_with_edges = [node for node in graph.nodes() if graph.degree(node) > 0]
     subgraph = graph.subgraph(nodes_with_edges)
